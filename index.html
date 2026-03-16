@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMGM RAF Campaign Audit — Q2 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #000B50;
+  --navy-dark: #0B1426;
+  --navy-mid: #0F1E36;
+  --mid-blue: #2C5FAD;
+  --light-blue: #00B3EB;
+  --bright-blue: #22FFFF;
+  --white: #FFFFFF;
+  --grey-50: #F8FAFC;
+  --grey-100: #F1F5F9;
+  --grey-200: #E2E8F0;
+  --grey-300: #CBD5E1;
+  --grey-400: #94A3B8;
+  --grey-500: #64748B;
+  --grey-600: #475569;
+  --grey-700: #334155;
+  --grey-800: #1E293B;
+  --grey-900: #0F172A;
+  --critical-bg: #FEF2F2;
+  --critical-border: #FECACA;
+  --critical-text: #DC2626;
+  --critical-badge: #DC2626;
+  --important-bg: #FFFBEB;
+  --important-border: #FDE68A;
+  --important-text: #D97706;
+  --important-badge: #D97706;
+  --minor-bg: #EFF6FF;
+  --minor-border: #BFDBFE;
+  --minor-text: #2563EB;
+  --minor-badge: #2563EB;
+  --correct-bg: #F0FDF4;
+  --correct-border: #BBF7D0;
+  --correct-text: #16A34A;
+  --suggested-bg: #EFF6FF;
+  --suggested-border: #93C5FD;
+  --suggested-header: #1D4ED8;
+  --amend-bg: #FFFBEB;
+  --amend-text: #B45309;
+  --add-bg: #F0FDF4;
+  --add-text: #15803D;
+  --remove-bg: #FEF2F2;
+  --remove-text: #B91C1C;
+  --font: 'Plus Jakarta Sans', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--grey-50); color: var(--grey-800); line-height: 1.6; }
+
+/* TOP BAR */
+.topbar {
+  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, var(--mid-blue) 100%);
+  padding: 28px 40px 20px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.topbar::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0,179,235,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.topbar-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+.topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 4px; }
+.topbar h1 span { background: linear-gradient(90deg, var(--light-blue), var(--bright-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.topbar-meta { font-size: 13px; color: var(--grey-300); margin-bottom: 16px; }
+.topbar-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1);
+}
+.stat-badge.critical { background: rgba(220,38,38,0.15); color: #FCA5A5; }
+.stat-badge.important { background: rgba(217,119,6,0.15); color: #FDE68A; }
+.stat-badge.minor { background: rgba(37,99,235,0.15); color: #93C5FD; }
+.stat-badge.total { background: rgba(255,255,255,0.1); color: white; }
+
+/* TAB NAV */
+.tab-nav {
+  background: white;
+  border-bottom: 1px solid var(--grey-200);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.tab-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; padding: 0 40px; }
+.tab-btn {
+  padding: 14px 24px; font-family: var(--font); font-size: 14px; font-weight: 600;
+  color: var(--grey-500); background: none; border: none; cursor: pointer;
+  border-bottom: 3px solid transparent; transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--navy); }
+.tab-btn.active { color: var(--navy); border-bottom-color: var(--mid-blue); }
+.tab-btn .tab-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; margin-left: 6px;
+  background: var(--grey-100); color: var(--grey-500);
+}
+.tab-btn.active .tab-count { background: var(--mid-blue); color: white; }
+
+/* MAIN CONTENT */
+.main { max-width: 1280px; margin: 0 auto; padding: 24px 40px 80px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 8px 16px; border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 600;
+  border: 1.5px solid var(--grey-200); background: white; color: var(--grey-600);
+  cursor: pointer; transition: all 0.2s;
+}
+.filter-btn:hover { border-color: var(--grey-400); }
+.filter-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+.filter-btn.active.f-critical { background: var(--critical-badge); border-color: var(--critical-badge); }
+.filter-btn.active.f-important { background: var(--important-badge); border-color: var(--important-badge); }
+.filter-btn.active.f-minor { background: var(--minor-badge); border-color: var(--minor-badge); }
+
+/* SECTION BLOCKS */
+.section-block { margin-bottom: 16px; border-radius: 12px; overflow: hidden; border: 1px solid var(--grey-200); background: white; }
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer; user-select: none; transition: background 0.2s;
+}
+.section-header:hover { background: var(--grey-50); }
+.section-header.navy-header { background: var(--navy); color: white; }
+.section-header.navy-header:hover { background: var(--navy-mid); }
+.section-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.section-chevron {
+  width: 20px; height: 20px; transition: transform 0.3s;
+  color: var(--grey-400); flex-shrink: 0;
+}
+.navy-header .section-chevron { color: rgba(255,255,255,0.6); }
+.section-header.open .section-chevron { transform: rotate(180deg); }
+.section-body { display: none; }
+.section-body.open { display: block; }
+
+/* SEVERITY BADGES */
+.severity { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.severity.critical { background: var(--critical-bg); color: var(--critical-text); border: 1px solid var(--critical-border); }
+.severity.important { background: var(--important-bg); color: var(--important-text); border: 1px solid var(--important-border); }
+.severity.minor { background: var(--minor-bg); color: var(--minor-text); border: 1px solid var(--minor-border); }
+.severity.correct { background: var(--correct-bg); color: var(--correct-text); border: 1px solid var(--correct-border); }
+
+/* ACTION BADGES */
+.action { display: inline-flex; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.action.amend { background: var(--amend-bg); color: var(--amend-text); }
+.action.add { background: var(--add-bg); color: var(--add-text); }
+.action.remove { background: var(--remove-bg); color: var(--remove-text); }
+.action.nochange { background: var(--correct-bg); color: var(--correct-text); }
+
+/* ISSUE CARDS */
+.issue-card {
+  padding: 16px 20px; border-bottom: 1px solid var(--grey-100);
+  display: grid; grid-template-columns: 160px 1fr 1fr auto;
+  gap: 16px; align-items: start; transition: background 0.15s;
+}
+.issue-card:hover { background: var(--grey-50); }
+.issue-card:last-child { border-bottom: none; }
+.issue-card.critical-row { border-left: 4px solid var(--critical-badge); }
+.issue-card.important-row { border-left: 4px solid var(--important-badge); }
+.issue-card.minor-row { border-left: 4px solid var(--minor-badge); }
+.issue-card.correct-row { border-left: 4px solid var(--correct-text); background: var(--correct-bg); }
+.issue-el { font-size: 13px; }
+.issue-el .el-name { font-weight: 700; color: var(--grey-800); margin-bottom: 4px; }
+.issue-el .el-section { font-size: 12px; color: var(--grey-500); }
+.issue-content { font-size: 13px; color: var(--grey-700); }
+.issue-content .content-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey-400); margin-bottom: 4px; }
+.issue-content .content-text { white-space: pre-line; }
+.issue-meta { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; min-width: 120px; }
+
+/* SUMMARY TABLE */
+.summary-table { width: 100%; border-collapse: collapse; }
+.summary-table th {
+  padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey-500);
+  background: var(--grey-50); border-bottom: 2px solid var(--grey-200);
+}
+.summary-table td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--grey-100); vertical-align: top; }
+.summary-table tr.critical-row td { background: var(--critical-bg); }
+.summary-table tr.important-row td { background: var(--important-bg); }
+.summary-table tr.minor-row td { background: var(--minor-bg); }
+.summary-table tr:hover td { filter: brightness(0.97); }
+.summary-table .issue-num { font-weight: 800; color: var(--grey-400); font-size: 12px; }
+.summary-table .material { font-weight: 600; font-size: 12px; }
+.summary-table .material.lp { color: var(--mid-blue); }
+.summary-table .material.edm { color: #7C3AED; }
+
+/* SUGGESTED EMAIL COPY */
+.suggested-block { margin: 0; border-top: 3px solid var(--suggested-header); background: var(--suggested-bg); }
+.suggested-header {
+  padding: 14px 20px; background: var(--suggested-header); color: white;
+  font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+}
+.suggested-header:hover { background: #1E40AF; }
+.suggested-body { display: none; padding: 0; }
+.suggested-body.open { display: block; }
+.suggested-row {
+  display: grid; grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(29,78,216,0.12);
+}
+.suggested-row:last-child { border-bottom: none; }
+.suggested-label {
+  padding: 12px 16px; font-size: 12px; font-weight: 700; color: var(--suggested-header);
+  background: rgba(29,78,216,0.06); border-right: 1px solid rgba(29,78,216,0.12);
+}
+.suggested-value { padding: 12px 16px; font-size: 13px; color: var(--navy); white-space: pre-line; line-height: 1.7; }
+
+/* DRIP JOURNEY MAP */
+.journey-map {
+  display: flex; gap: 4px; align-items: stretch; margin-bottom: 24px;
+  overflow-x: auto; padding-bottom: 8px;
+}
+.journey-step {
+  flex: 1; min-width: 160px; padding: 14px; border-radius: 10px;
+  background: white; border: 1.5px solid var(--grey-200); text-align: center;
+  position: relative;
+}
+.journey-step .step-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey-400); margin-bottom: 4px; }
+.journey-step .step-name { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+.journey-step .step-trigger { font-size: 11px; color: var(--grey-500); }
+.journey-step.inviter { border-color: var(--mid-blue); background: rgba(44,95,173,0.04); }
+.journey-step.invitee { border-color: #7C3AED; background: rgba(124,58,237,0.04); }
+.journey-arrow { display: flex; align-items: center; color: var(--grey-300); font-size: 18px; padding: 0 2px; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .topbar { padding: 20px 16px; }
+  .tab-nav-inner { padding: 0 16px; }
+  .main { padding: 16px 16px 60px; }
+  .issue-card { grid-template-columns: 1fr; }
+  .tab-btn { padding: 12px 14px; font-size: 13px; }
+  .summary-table { font-size: 12px; }
+  .suggested-row { grid-template-columns: 1fr; }
+  .suggested-label { border-right: none; border-bottom: 1px solid rgba(29,78,216,0.12); }
+}
+
+/* PRINT */
+@media print {
+  .topbar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tab-nav { display: none; }
+  .filter-bar { display: none; }
+  .tab-content { display: block !important; page-break-before: always; }
+  .tab-content:first-child { page-break-before: auto; }
+  .section-body { display: block !important; }
+  .suggested-body { display: block !important; }
+  .section-header { cursor: default; }
+  body { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <h1>TMGM <span>Refer-A-Friend</span> Campaign Audit</h1>
+    <div class="topbar-meta">Q2 2026 (01 Apr – 30 Jun)  •  Source of Truth: RAF T&C (VFSC 40356, dated 09 March 2026)  •  English content only</div>
+    <div class="topbar-stats">
+      <span class="stat-badge critical">🔴 16 Critical</span>
+      <span class="stat-badge important">🟡 21 Important</span>
+      <span class="stat-badge minor">🟢 7 Minor</span>
+      <span class="stat-badge total">44 Total Issues</span>
+    </div>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" onclick="switchTab('summary')">Master Summary <span class="tab-count">44</span></button>
+    <button class="tab-btn" onclick="switchTab('lp')">Landing Page <span class="tab-count">27</span></button>
+    <button class="tab-btn" onclick="switchTab('edm')">EDM Drip Journey <span class="tab-count">17</span></button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ============================================================ -->
+<!-- TAB: MASTER SUMMARY -->
+<!-- ============================================================ -->
+<div id="tab-summary" class="tab-content active">
+
+<!-- CRITICAL SECTION -->
+<div class="section-block" style="border-color:var(--critical-border);">
+<div class="section-header open" onclick="toggleSection(this)" style="background:var(--critical-badge);color:white;">
+  <h3>🔴 Critical — Must fix before launch (16 issues)</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:rgba(255,255,255,0.7);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body open">
+<table class="summary-table"><thead><tr><th>#</th><th>Material</th><th>Section / Element</th><th>Issue</th><th>Action</th></tr></thead><tbody>
+<tr class="critical-row"><td class="issue-num">1</td><td><span class="material lp">Landing Page</span></td><td>Hero — Promotion Period missing</td><td>Dates (01 Apr – 30 Jun 2026) completely absent from entire page.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="critical-row"><td class="issue-num">2</td><td><span class="material lp">Landing Page</span></td><td>Hero — Reward requirements missing</td><td>Says $50 but omits $100 deposit + 1 lot requirement.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="critical-row"><td class="issue-num">3</td><td><span class="material lp">Landing Page</span></td><td>How to Get Started — Wrong user journey</td><td>New User tab shows Inviter steps instead of Invitee steps.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">4</td><td><span class="material lp">Landing Page</span></td><td>How to Get Started — Requirements absent</td><td>Steps omit $100 deposit and 1 lot requirement.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="critical-row"><td class="issue-num">5</td><td><span class="material lp">Landing Page</span></td><td>Reward Structure — Specifics missing</td><td>$50 shown but $100 deposit, 1 lot, 90-day countdown not stated.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">6</td><td><span class="material lp">Landing Page</span></td><td>Reward Structure — $25 provisional caveat</td><td>No warning that $25 display is not withdrawable until all tasks complete.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="critical-row"><td class="issue-num">7</td><td><span class="material lp">Landing Page</span></td><td>Key T&C Section — Entirely missing</td><td>Standard framework Section 4 absent. Countries, rules, mechanics not surfaced.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="critical-row"><td class="issue-num">8</td><td><span class="material lp">Landing Page</span></td><td>FAQ — Withdrawal oversimplified</td><td>Says "instantly withdraw" without provisional reward caveat (T&C E.4).</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">9</td><td><span class="material edm">EDM</span></td><td>Inviter >2 — IB pitch contradicts T&C B.5</td><td>Encourages IB sign-up which would INVALIDATE pending RAF rewards.</td><td><span class="action amend">✏️ Amend / Postpone</span></td></tr>
+<tr class="critical-row"><td class="issue-num">10</td><td><span class="material edm">EDM</span></td><td>Inviter >2 — CTA links to IB registration</td><td>Direct link to tmgmpartners.com during RAF period risks reward loss.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">11</td><td><span class="material edm">EDM</span></td><td>Inviter >2 — No RAF impact disclaimer</td><td>No warning that becoming IB could cancel rewards.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="critical-row"><td class="issue-num">12</td><td><span class="material edm">EDM</span></td><td>Inviter 1 — "successfully joins" is vague</td><td>Implies just signing up earns $50. Must specify deposit + trade requirements.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">13</td><td><span class="material edm">EDM</span></td><td>Inviter 1 — "registration within 90 days" wrong</td><td>Conflates Promotion Period deadline with 90-day countdown.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">14</td><td><span class="material edm">EDM</span></td><td>Multiple emails — withdrawal claims misleading</td><td>"No withdrawal restrictions" / "instant" across 4+ emails. T&C E.4 says rewards are provisional.</td><td><span class="action amend">✏️ Amend all</span></td></tr>
+<tr class="critical-row"><td class="issue-num">15</td><td><span class="material edm">EDM</span></td><td>Invitee S3 — "program never stops"</td><td>T&C defines fixed period (01 Apr – 30 Jun). "Never stops" is misleading.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="critical-row"><td class="issue-num">16</td><td><span class="material edm">EDM</span></td><td>Invitee S1 (ID) — $150 instead of $50</td><td>Indonesian translation has wrong reward amount. Critical data error.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+</tbody></table>
+</div>
+</div>
+
+<!-- IMPORTANT SECTION -->
+<div class="section-block" style="border-color:var(--important-border);">
+<div class="section-header" onclick="toggleSection(this)" style="background:var(--important-badge);color:white;">
+  <h3>🟡 Important — Should fix for quality and completeness (21 issues)</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:rgba(255,255,255,0.7);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+<table class="summary-table"><thead><tr><th>#</th><th>Material</th><th>Section / Element</th><th>Issue</th><th>Action</th></tr></thead><tbody>
+<tr class="important-row"><td class="issue-num">17</td><td><span class="material lp">Landing Page</span></td><td>Hero — Subheading ambiguity</td><td>Implies both parties deposit/trade. Only Invitee does.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">18</td><td><span class="material lp">Landing Page</span></td><td>How to Get Started — 90-day countdown</td><td>Not mentioned in steps.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">19</td><td><span class="material lp">Landing Page</span></td><td>How to Get Started — Existing User tab</td><td>Not visible in screenshot. Needs verification.</td><td><span class="action amend">✏️ Verify</span></td></tr>
+<tr class="important-row"><td class="issue-num">20</td><td><span class="material lp">Landing Page</span></td><td>Reward Structure — Per-person clarity</td><td>Unclear if $50 is per person or total.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">21</td><td><span class="material lp">Landing Page</span></td><td>Reward Structure — Volume formula</td><td>No eligible products or formula shown.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">22</td><td><span class="material lp">Landing Page</span></td><td>Key T&Cs — Eligible countries missing</td><td>21 countries not listed anywhere on page.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">23</td><td><span class="material lp">Landing Page</span></td><td>Key T&Cs — Cents Account restriction</td><td>Not mentioned. Critical for SEA markets.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">24</td><td><span class="material lp">Landing Page</span></td><td>Key T&Cs — IB/Affiliate + T&C link</td><td>Restriction incomplete. No link to full T&C document.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">25</td><td><span class="material lp">Landing Page</span></td><td>FAQ — Multiple eligibility gaps</td><td>Missing MT4/MT5, country specifics, both-party rule, Affiliates, dates.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">26</td><td><span class="material lp">Landing Page</span></td><td>FAQ — Missing requirements FAQ</td><td>No FAQ explaining deposit $100 + trade 1 lot.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">27</td><td><span class="material lp">Landing Page</span></td><td>FAQ — Missing products + Cents FAQ</td><td>No FAQ on volume formula or Cents restriction.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">28</td><td><span class="material edm">EDM</span></td><td>No Promotion Period in any email</td><td>Not a single email includes campaign dates.</td><td><span class="action add">✅ Add to all</span></td></tr>
+<tr class="important-row"><td class="issue-num">29</td><td><span class="material edm">EDM</span></td><td>CTA URL inconsistency</td><td>tmgm-asia.com vs tmgm-sea.com across emails.</td><td><span class="action amend">✏️ Verify</span></td></tr>
+<tr class="important-row"><td class="issue-num">30</td><td><span class="material edm">EDM</span></td><td>No ROW country coverage</td><td>Emails in EN/ID/VN/TH/KO only. 14 ROW countries may need coverage.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">31</td><td><span class="material edm">EDM</span></td><td>Invitee S1 — "up to $50" wording</td><td>"Up to" implies variable. Reward is fixed $50.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">32</td><td><span class="material edm">EDM</span></td><td>Invitee S1 — 90-day note missing from steps</td><td>Steps list requirements but no countdown deadline.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">33</td><td><span class="material edm">EDM</span></td><td>Invitee S1(a) — "Unlimited reward potential" vague</td><td>Should specify $50 per referral, unlimited referrals.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">34</td><td><span class="material edm">EDM</span></td><td>Invitee S1(a) — No deposit/lot requirements</td><td>Doesn't mention what invitees' friends need to do.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">35</td><td><span class="material edm">EDM</span></td><td>S2 All — "Newbie tasks" vague language</td><td>Intro paragraphs sometimes don't specify requirements.</td><td><span class="action amend">✏️ Amend</span></td></tr>
+<tr class="important-row"><td class="issue-num">36</td><td><span class="material edm">EDM</span></td><td>S2 All — No product eligibility / volume formula</td><td>"Trade 1 lot" without specifying which products count.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="important-row"><td class="issue-num">37</td><td><span class="material edm">EDM</span></td><td>S2 All — No Cents Account warning</td><td>SEA users may default to Cents Accounts.</td><td><span class="action add">✅ Add</span></td></tr>
+</tbody></table>
+</div>
+</div>
+
+<!-- MINOR SECTION -->
+<div class="section-block" style="border-color:var(--minor-border);">
+<div class="section-header" onclick="toggleSection(this)" style="background:var(--minor-badge);color:white;">
+  <h3>🟢 Minor — Nice to fix for polish and consistency (7 issues)</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:rgba(255,255,255,0.7);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+<table class="summary-table"><thead><tr><th>#</th><th>Material</th><th>Section / Element</th><th>Issue</th><th>Action</th></tr></thead><tbody>
+<tr class="minor-row"><td class="issue-num">38</td><td><span class="material lp">Landing Page</span></td><td>How to Get Started — CTA link</td><td>Verify "Join Now" links to registration not login.</td><td><span class="action amend">✏️ Verify</span></td></tr>
+<tr class="minor-row"><td class="issue-num">39</td><td><span class="material lp">Landing Page</span></td><td>Sharing section — Feature verification</td><td>"One-Click Share" — verify exists in portal.</td><td><span class="action amend">✏️ Verify</span></td></tr>
+<tr class="minor-row"><td class="issue-num">40</td><td><span class="material lp">Landing Page</span></td><td>FAQ — Terminology inconsistency</td><td>Referrer/Referee vs Inviter/Invitee across materials.</td><td><span class="action amend">✏️ Align</span></td></tr>
+<tr class="minor-row"><td class="issue-num">41</td><td><span class="material lp">Landing Page</span></td><td>Key T&Cs — TMGM Rights clause</td><td>Standard clause missing from page.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="minor-row"><td class="issue-num">42</td><td><span class="material lp">Landing Page</span></td><td>Trust Badges — May be missing</td><td>Could not confirm in screenshot.</td><td><span class="action amend">✏️ Verify</span></td></tr>
+<tr class="minor-row"><td class="issue-num">43</td><td><span class="material edm">EDM</span></td><td>Inviter 1 — No T&C link</td><td>T&C asterisk but no link to document.</td><td><span class="action add">✅ Add</span></td></tr>
+<tr class="minor-row"><td class="issue-num">44</td><td><span class="material edm">EDM</span></td><td>All emails — Abbreviated disclaimer</td><td>Shorter than full T&C Section F. Confirm with compliance.</td><td><span class="action amend">✏️ Verify</span></td></tr>
+</tbody></table>
+</div>
+</div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB: LANDING PAGE -->
+<!-- ============================================================ -->
+<div id="tab-lp" class="tab-content">
+
+<!-- SECTION: HERO BANNER -->
+<div class="section-block">
+<div class="section-header navy-header open" onclick="toggleSection(this)">
+  <h3>Section 1: Hero Banner</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body open">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Promotion Period</div><div class="el-section">Hero Banner</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">NOT DISPLAYED — dates completely absent from the hero and the entire page</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">01 April 2026 – 30 June 2026 (MT4/MT5 Time)
+Display prominently in hero section with calendar icon/pill badge</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Reward Requirements</div><div class="el-section">Hero Banner</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Hero mentions $50 but omits the requirements to earn it</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Include: Invitee must deposit min. USD $100 and trade 1 standard lot within 90 days</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">H2 Subheading</div><div class="el-section">Hero Banner</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Deposit, Trade, and both of you can earn $50"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"Refer a friend — when they deposit &amp; trade, you BOTH earn $50"
+Per T&C B.2/C.1 — only the Invitee deposits and trades.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">$50 Reward Amount</div><div class="el-section">Hero Banner</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Matches T&C C.1: Total Inviter's Reward = $50, Total Invitee's Reward = $50.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">CTA — "Refer Now"</div><div class="el-section">Hero Banner</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Appropriate CTA for existing users (Inviters) to access Client Portal.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">T&C Note</div><div class="el-section">Hero Banner</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ "*Terms and Conditions Apply" is present.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION: HOW TO GET STARTED -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Section 2: How to Get Started</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Step 2 — "Share Your Referral Link"</div><div class="el-section">New User Tab</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">New User flow shows:
+1. Open Live Account
+2. Share Your Referral Link
+3. Receive Your Rewards</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">New User = Invitee journey:
+1. Register via Referral Link
+2. Deposit min. $100
+3. Trade 1 Standard Lot → Both earn $50
+
+Per T&C C.3 — Inviter is an existing client. New User tab should show Invitee journey.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Missing deposit &amp; lot requirements</div><div class="el-section">New User Tab</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Steps don't mention $100 deposit or 1 standard lot requirement</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "Deposit min. USD $100" and "Trade 1 standard lot within 90 days"
+Per T&C B.2 and C.1.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">90-day Countdown missing</div><div class="el-section">New User Tab</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No mention of 90-day deadline for completing tasks</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "Complete deposit and trading within 90 days of account setup"
+Per T&C B.2/B.3.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Existing User tab not verified</div><div class="el-section">Existing User Tab</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Only the New User tab visible in the screenshot</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Verify Existing User tab shows Inviter flow:
+1. Log in to Client Portal
+2. Share Referral Link / QR Code
+3. Earn $50 when friend completes tasks</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Verify</span></div>
+  </div>
+  <div class="issue-card minor-row">
+    <div class="issue-el"><div class="el-name">CTA — "Join Now"</div><div class="el-section">New User Tab</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">CTA button says "Join Now"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Verify links to registration/sign-up page (NOT login). Per framework: New User CTA → registration.</div></div>
+    <div class="issue-meta"><span class="severity minor">🟢 Minor</span><span class="action amend">✏️ Verify</span></div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION: REWARD STRUCTURE -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Section 4: Reward Structure</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Missing specific requirements</div><div class="el-section">Reward Structure</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Shows "USD $50" reward but specifics unclear</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Must clearly state:
+• Min. first-time deposit: USD $100
+• Min. trading volume: 1 standard lot
+• 90-day countdown period
+• Both Inviter and Invitee each receive $50</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">$25 provisional display caveat</div><div class="el-section">Reward Structure</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No mention of provisional $25 display or its non-redeemable nature</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "A $25 reward will display after registration — this is provisional and NOT withdrawable until the Invitee completes all tasks."
+Per T&C E.4.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Per-person clarity</div><div class="el-section">Reward Structure</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"USD $50" visual — unclear if per person or total</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Clarify: "Inviter earns $50 + Invitee earns $50" (each, per referral)</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Trading volume formula missing</div><div class="el-section">Reward Structure</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No mention of eligible products or volume formula</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">FX &amp; Metals = full lots; Oil/CFDs/Crypto = 1/10; Shares excluded. Trades held ≥2 mins.
+Per T&C D.1.a-b.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION: KEY T&Cs MISSING -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Section 5: Key Terms &amp; Conditions — ❌ ENTIRE SECTION MISSING</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Entire Section</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">This section DOES NOT EXIST on the current landing page</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add a dedicated Key Terms &amp; Conditions section per the 9-section framework (Section 4) covering all key rules.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Eligible Countries</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">NOT LISTED anywhere on the landing page</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">SEA: Indonesia, Malaysia, Vietnam, Thailand, Laos, Philippines, South Korea
+ROW: Germany, Netherlands, Italy, Belgium, Poland, Croatia, Czech Republic, Turkey, Greece, Nigeria, Kenya, UAE, Saudi Arabia, Jordan, Bahrain, Kuwait, Oman
+Per T&C Appendix 1 — 21 countries total.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">90-day Countdown Period</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">NOT MENTIONED</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Invitee has 90 days from first Trading Account setup. Can extend beyond Promotion Period end date. Per T&C B.3.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Cents Account restriction</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">NOT MENTIONED</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Cents Accounts: eligible for deposit calculations only. Trading volume does NOT count. Per T&C D.3.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">IB/Affiliate restriction</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Only partially mentioned in FAQ (IB only, missing Affiliates)</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Neither party may have IB or Affiliate agreement. Per T&C B.1.b/B.5.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Full T&C link</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No link to the full T&C PDF document anywhere</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "For full Terms and Conditions, click here" (link to T&C PDF) or contact support@tmgm.com</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card minor-row">
+    <div class="issue-el"><div class="el-name">TMGM Rights clause</div><div class="el-section">Key T&Cs (Missing)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">NOT MENTIONED</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">TMGM reserves the right to modify/terminate. May reject if manipulation suspected. Per T&C A.3/A.4.</div></div>
+    <div class="issue-meta"><span class="severity minor">🟢 Minor</span><span class="action add">✅ Add</span></div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION: FAQ -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Section 6: Frequently Asked Questions</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Q1: Missing MT4/MT5</div><div class="el-section">FAQ — Eligibility</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">3 conditions listed, MT4/MT5 requirement missing</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: Must have at least one MT4/MT5 trading account. Per T&C B.1.a.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Q1: "SEA and ROW" too vague</div><div class="el-section">FAQ — Eligibility</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Says "registered users from SEA and ROW regions" without listing countries</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">List all 21 countries or add clear link. Per T&C Appendix 1. Client from Cambodia (SEA) or Egypt (ROW) would not know they're ineligible.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Q1: Both parties must be eligible</div><div class="el-section">FAQ — Eligibility</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Only implies one party needs to be from eligible region</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Clarify: BOTH Inviter AND Invitee must be from Appendix 1 countries. Per T&C B.1.c/B.5.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Q1: Missing Affiliates</div><div class="el-section">FAQ — Eligibility</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Says "non-IB clients" only</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Should say: no IB OR Affiliate agreement. Per T&C B.1.b/B.5.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Q1: No Promotion Period</div><div class="el-section">FAQ — Eligibility</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No dates in eligibility answer</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: Runs 01 April – 30 June 2026 (MT4/MT5 Time). Per T&C A.1.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Q2: Existing customers</div><div class="el-section">FAQ</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Correct — aligns with T&C C.3/C.4. Invitee must be new client.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Q3: Track progress</div><div class="el-section">FAQ</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Correct — aligns with T&C E.3.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Q4: Duplicate referrals</div><div class="el-section">FAQ</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Helpful operational clarification. Doesn't contradict T&C.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Q5: Withdrawal oversimplified</div><div class="el-section">FAQ</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Yes, you can! You can instantly withdraw your rewards as soon as you receive them!"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add caveat: Rewards are provisional until ALL tasks complete. The $25 display is NOT withdrawable until Invitee finishes deposit + trading. Once all conditions met, no rollover required.
+Per T&C E.4. Dangerously oversimplified.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card minor-row">
+    <div class="issue-el"><div class="el-name">Terminology</div><div class="el-section">FAQ</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Uses "Referrer/Referee" throughout</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">T&C uses "Inviter/Invitee". Align or add note.</div></div>
+    <div class="issue-meta"><span class="severity minor">🟢 Minor</span><span class="action amend">✏️ Align</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Missing FAQ: Requirements</div><div class="el-section">FAQ (New)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No FAQ explains what Invitee needs to do</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "What does my friend need to do?" — Deposit $100, trade 1 lot within 90 days. Per T&C C.1.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Missing FAQ: Products + Cents</div><div class="el-section">FAQ (New)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No FAQ about volume formula or Cents Account restriction</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: FX/Metals full lot, Oil/CFDs/Crypto at 1/10, Shares excluded. Cents Account volume doesn't count. Per T&C D.1/D.3.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION: STANDARD SECTIONS -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Sections 7–9: Standard Sections (Trust Badges, CTA, Footer, Disclaimer)</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">CTA Banner (S7)</div><div class="el-section">Standard</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Blue gradient CTA with "Start Trading" button present.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Footer (S8)</div><div class="el-section">Standard</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Social icons, contact info, links all present.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Disclaimer (S9)</div><div class="el-section">Standard</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Standard VFSC 40356 risk warning and regulatory grid present.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card minor-row">
+    <div class="issue-el"><div class="el-name">Trust Badges (S6)</div><div class="el-section">Standard</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Could not confirm in screenshot</div></div>
+    <div class="issue-content"><div class="content-label">Should Be</div><div class="content-text">Verify 4 trust badges present on live page. Standard section on all TMGM promo pages.</div></div>
+    <div class="issue-meta"><span class="severity minor">🟢 Minor</span><span class="action amend">✏️ Verify</span></div>
+  </div>
+</div>
+</div>
+
+</div><!-- end tab-lp -->
+
+<!-- ============================================================ -->
+<!-- TAB: EDM DRIP JOURNEY -->
+<!-- ============================================================ -->
+<div id="tab-edm" class="tab-content">
+
+<!-- JOURNEY MAP -->
+<h2 style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:16px;">EDM Drip Journey Map</h2>
+<div class="journey-map">
+  <div class="journey-step inviter"><div class="step-label">Inviter</div><div class="step-name">1 Invitee</div><div class="step-trigger">Newbie inviter</div></div>
+  <div class="journey-arrow">→</div>
+  <div class="journey-step inviter"><div class="step-label">Inviter</div><div class="step-name">> 2 Invitees</div><div class="step-trigger">⚠️ IB Pitch</div></div>
+  <div class="journey-arrow" style="width:24px;"></div>
+  <div class="journey-step invitee"><div class="step-label">Invitee</div><div class="step-name">S1: Sign Up</div><div class="step-trigger">TA not opened</div></div>
+  <div class="journey-arrow">→</div>
+  <div class="journey-step invitee"><div class="step-label">Invitee</div><div class="step-name">S1(a): Dual Role</div><div class="step-trigger">TA not opened</div></div>
+  <div class="journey-arrow">→</div>
+  <div class="journey-step invitee"><div class="step-label">Invitee</div><div class="step-name">S2: Countdown</div><div class="step-trigger">+3d / +30d / +87d</div></div>
+  <div class="journey-arrow">→</div>
+  <div class="journey-step invitee"><div class="step-label">Invitee</div><div class="step-name">S3: Winner!</div><div class="step-trigger">Tasks complete</div></div>
+</div>
+
+<!-- EMAIL 1: INVITER 1 INVITEE -->
+<div class="section-block">
+<div class="section-header navy-header open" onclick="toggleSection(this)">
+  <h3>Email 1: Inviter — 1 Invitee &nbsp;|&nbsp; Target: Newbie inviter</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body open">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"successfully joins"</div><div class="el-section">Content1</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Earn $50 for yourself and $50 for each friend who successfully joins."</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"Earn $50 for yourself and $50 for each friend who deposits min. $100 and trades 1 standard lot within 90 days."
+Per T&C C.1 — "successfully joins" implies just signing up.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"registration within 90 days"</div><div class="el-section">Content1a</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Remind your friends to complete their account registration within 90 days so you both secure your rewards.*"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"Remind your friends to complete their deposit ($100 min.) and trade 1 lot within 90 days of setting up their Trading Account so you both secure your rewards.*"
+Per T&C B.3 — Registration must happen within the Promotion Period. 90 days is for deposit + trading.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"Withdraw whenever you want"</div><div class="el-section">Content2a</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"✅ Withdraw your cash rewards whenever you want"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"✅ Withdraw your cash rewards once all conditions are met — no rollover required"
+Per T&C E.4 — rewards are provisional.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">No Promotion Period</div><div class="el-section">Entire Email</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No campaign dates anywhere</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "This promotion runs from 01 April – 30 June 2026 (MT4/MT5 Time)"</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card minor-row">
+    <div class="issue-el"><div class="el-name">No T&C link</div><div class="el-section">Entire Email</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">T&C asterisk but no link</div></div>
+    <div class="issue-content"><div class="content-label">Should Be</div><div class="content-text">Add: "*For full T&Cs, visit [link] or contact support@tmgm.com"</div></div>
+    <div class="issue-meta"><span class="severity minor">🟢 Minor</span><span class="action add">✅ Add</span></div>
+  </div>
+
+  <!-- SUGGESTED COPY -->
+  <div class="suggested-block">
+    <div class="suggested-header" onclick="toggleSuggested(this)">📝 Full Suggested Email Copy — Inviter 1 Invitee <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Email Subject</div><div class="suggested-value">Refer More Friends, Unlock Your Rewards!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Preview Text</div><div class="suggested-value">Refer more friends now to claim your rewards</div></div>
+      <div class="suggested-row"><div class="suggested-label">Header Banner</div><div class="suggested-value">Turn Your Network Into Rewards.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Salutation</div><div class="suggested-value">Dear [Name],</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1</div><div class="suggested-value">Congratulations on starting your journey with the TMGM Refer-a-Friend Program! You've taken the first step — now it's time to take it to the next level.
+
+The more friends you refer, the more rewards you can unlock. Earn $50 for yourself and $50 for each friend who deposits a minimum of $100 and trades at least 1 standard lot within 90 days of setting up their Trading Account.
+
+This promotion runs from 01 April – 30 June 2026 (MT4/MT5 Time). Share your referral link before the promotion ends!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1a</div><div class="suggested-value">Here are some easy ways to help you invite more friends and get the most out of your rewards:
+
+Make it simple!
+Use your personal referral link or QR code to invite friends directly.
+
+Stay connected
+Check your Refer-a-Friend dashboard to see who's joined. Remind your friends to complete their first deposit ($100 min.) and trade 1 lot within 90 days of setting up their Trading Account so you both secure your rewards.*</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">Grab your referral link</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-asia.com/refer-friends/invite-friends</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2</div><div class="suggested-value">Here's why it's worth sharing</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2a</div><div class="suggested-value">✅ No limit. Invite as many friends as you like
+✅ Withdraw your cash rewards once all conditions are met — no rollover required
+✅ Or boost your trading with your rewards
+
+*For full Terms and Conditions, visit [T&C link] or contact support@tmgm.com
+T&Cs apply</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">Grab your referral link</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-asia.com/refer-friends/invite-friends</div></div>
+      <div class="suggested-row"><div class="suggested-label">Disclaimer</div><div class="suggested-value">Disclaimer: Investing in CFDs carries significant risks and is not suitable for all investors. VFSC 40356</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMAIL 2: INVITER > 2 (IB) -->
+<div class="section-block" style="border-color:var(--critical-border);">
+<div class="section-header navy-header" onclick="toggleSection(this)" style="background:var(--critical-badge);">
+  <h3>⚠️ Email 2: Inviter > 2 Invitees &nbsp;|&nbsp; MAJOR COMPLIANCE ISSUE — IB Pitch</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">ENTIRE EMAIL — IB pitch</div><div class="el-section">All Content</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Email encourages Inviters to become Introducing Brokers: "BECOME A TMGM INTRODUCING BROKER" with direct sign-up link to tmgmpartners.com</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">OPTION A: Replace IB pitch with content encouraging more RAF referrals
+OPTION B: Postpone this email until AFTER the Promotion Period ends (30 Jun 2026) and all rewards are claimed
+
+Per T&C B.5: "During the Promotion Period, neither the Inviter nor Invitee is allowed to enter into any IB or Affiliate Agreements... the Rewards may be affected, and the referral link will become invalid."</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend / Postpone</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">CTA links to IB registration</div><div class="el-section">CTA</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">CTA: "FIND OUT MORE" / "JOIN NOW"
+URL: https://www.tmgmpartners.com/en/partners-program/introducing-broker</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">If keeping email during promo period: CTA should link to RAF portal, NOT IB sign-up</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">No RAF impact disclaimer</div><div class="el-section">Missing</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No warning about RAF reward consequences</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">If IB email sent at all, MUST include: "Entering an IB agreement during the RAF Promotion Period may affect your pending rewards."</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action add">✅ Add</span></div>
+  </div>
+
+  <div class="suggested-block">
+    <div class="suggested-header" onclick="toggleSuggested(this)">📝 OPTION A: Corrected Email — Replace IB pitch with more RAF encouragement <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Email Subject</div><div class="suggested-value">You're on a Roll — Keep Referring, Keep Earning!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Preview Text</div><div class="suggested-value">You've referred 2+ friends. Keep going to maximise your rewards.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Header Banner</div><div class="suggested-value">YOU'RE A REFERRAL CHAMPION — KEEP GOING!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Salutation</div><div class="suggested-value">Dear [Name],</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1</div><div class="suggested-value">You've done brilliantly with our Refer-a-Friend Program, bringing in more than two successful referrals. That's an impressive achievement!
+
+But why stop now? There's no limit to how many friends you can refer — and every successful referral earns you another $50.
+
+Remember, your referred friends need to deposit a minimum of $100 and trade at least 1 standard lot within 90 days of setting up their Trading Account for both of you to earn your rewards.
+
+This promotion runs until 30 June 2026 (MT4/MT5 Time) — make the most of it!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1a</div><div class="suggested-value">Tips for maximising your referrals:
+
+✅ Share your link on social media to reach more people
+✅ Use your QR code at meetups or events
+✅ Check your Refer-a-Friend dashboard to track who's joined and remind friends to complete their tasks
+✅ Withdraw your rewards once all conditions are met — no rollover required
+
+*For full Terms and Conditions, visit [T&C link] or contact support@tmgm.com
+T&Cs apply</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">Keep Referring Now</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-asia.com/refer-friends/invite-friends</div></div>
+      <div class="suggested-row"><div class="suggested-label">Disclaimer</div><div class="suggested-value">Disclaimer: Investing in CFDs carries significant risks and is not suitable for all investors. VFSC 40356</div></div>
+    </div>
+  </div>
+  <div class="suggested-block" style="border-top-color:var(--important-badge);">
+    <div class="suggested-header" onclick="toggleSuggested(this)" style="background:var(--important-badge);">📝 OPTION B: Postpone IB Email (Recommended) <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Recommendation</div><div class="suggested-value">POSTPONE this email until after 30 June 2026 and after all RAF rewards have been claimed.
+
+Rationale: Per T&C B.5, entering an IB agreement during the Promotion Period invalidates RAF rewards. Even with a disclaimer, the risk of clients acting prematurely and losing rewards is too high.
+
+Suggested trigger: Send 7–14 days after the Promotion Period ends (mid-July 2026), targeting Inviters who successfully completed 2+ referrals. At that point, the IB pitch is safe because RAF rewards have already been settled.
+
+The original email content (IB pitch) can be reused at that time with minor adjustments to remove RAF-specific references.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMAIL 3: INVITEE S1 -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Email 3: Invitee S1 &nbsp;|&nbsp; TA Not Opened &nbsp;|&nbsp; Sign-up nudge</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">"earning up to $50"</div><div class="el-section">Content1</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"start earning up to $50 for you and $50 for your friend"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"earn $50 for you and $50 for your friend" — remove "up to" since $50 is fixed, not a cap. Per T&C C.1.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"No withdrawal restrictions"</div><div class="el-section">Content3a</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"✅ No withdrawal restrictions on RAF rewards"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"✅ No rollover requirements — withdraw your rewards once all conditions are met"
+Per T&C E.4.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">No Promotion Period</div><div class="el-section">Entire Email</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No campaign dates</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: Promotion runs 01 April – 30 June 2026. Register within this period to qualify.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">Steps missing 90-day note</div><div class="el-section">Content2a</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Steps: Deposit $100, Trade 1 lot — but no countdown deadline</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "Complete these tasks within 90 days of setting up your Trading Account"</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+
+  <div class="suggested-block">
+    <div class="suggested-header" onclick="toggleSuggested(this)">📝 Full Suggested Email Copy — Invitee S1 <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Email Subject</div><div class="suggested-value">Act Fast: $50 Referral Reward Awaits!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Preview Text</div><div class="suggested-value">What are you waiting for? Complete your sign-up now!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Header Banner</div><div class="suggested-value">YOUR $50 BONUS IS WAITING
+COMPLETE YOUR SIGN-UP NOW</div></div>
+      <div class="suggested-row"><div class="suggested-label">Salutation</div><div class="suggested-value">Dear [Name],</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1</div><div class="suggested-value">Congratulations on taking the first step with TMGM's Refer-a-Friend Program! 🎉
+
+You're just one step away from unlocking your reward. Simply complete your Trading Account sign-up and you'll be on your way to earning $50 — and your friend who referred you earns $50 too.
+
+This promotion runs from 01 April – 30 June 2026 (MT4/MT5 Time). Make sure you register within this period to qualify.</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">CONTINUE SIGN UP</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-sea.com/register</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2</div><div class="suggested-value">Your reward is only a few clicks away:</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2a</div><div class="suggested-value">Step 1: Complete Your Trading Account
+Log in to your Client Portal and finish setting up your account.
+
+Step 2: Make Your First Deposit
+Deposit a minimum of $100 (first deposit only).
+
+Step 3: Place Your First Trade
+Trade at least 1 standard lot within 90 days of setting up your Trading Account to unlock your $50 RAF reward.</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">DEPOSIT NOW</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-sea.com/login?redirect=/funding/deposit</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content3</div><div class="suggested-value">Unlock Greater Trading Opportunities — Don't Miss Out!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content3a</div><div class="suggested-value">✅ No rollover requirements — withdraw your rewards once all conditions are met
+✅ Use your RAF bonus to amplify your trading
+
+*For full Terms and Conditions, visit [T&C link] or contact support@tmgm.com
+T&Cs apply</div></div>
+      <div class="suggested-row"><div class="suggested-label">Disclaimer</div><div class="suggested-value">Disclaimer: Investing in CFDs carries significant risks and is not suitable for all investors. VFSC 40356</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMAIL 4: INVITEE S1(a) -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Email 4: Invitee S1(a) &nbsp;|&nbsp; TA Not Opened &nbsp;|&nbsp; Dual-role pitch</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"Instant bonuses with no withdrawal restrictions"</div><div class="el-section">Content1</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Instant bonuses with no withdrawal restrictions."</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"Cash bonuses with no rollover requirements — withdraw once all conditions are met."
+Per T&C E.4 — "Instant" + "no withdrawal restrictions" is the strongest misleading claim across all emails.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">"Unlimited reward potential"</div><div class="el-section">Content1</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Unlimited reward potential: earn as both inviter and invitee."</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"Earn $50 per successful referral — as both invitee and inviter, with no cap on referrals."</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">No deposit/lot requirements</div><div class="el-section">Entire Email</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Doesn't mention what invitees' friends need to do</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: Friends need to deposit min. $100 and trade 1 standard lot within 90 days. Per T&C C.1.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+
+  <div class="suggested-block">
+    <div class="suggested-header" onclick="toggleSuggested(this)">📝 Full Suggested Email Copy — Invitee S1(a) <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Email Subject</div><div class="suggested-value">Invite. Earn. Repeat. Grow Your Rewards with TMGM.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Preview Text</div><div class="suggested-value">Invite your friends and enjoy double rewards as invitee and inviter.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Header Banner</div><div class="suggested-value">Double the Role, Double the Rewards.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Salutation</div><div class="suggested-value">Dear [Name],</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1</div><div class="suggested-value">Grow your rewards potential by inviting your friends to TMGM. When your invitees become inviters, your RAF network expands and creates more opportunities to earn.
+
+Here's what you'll enjoy with TMGM:
+• Earn $50 per successful referral — as both invitee and inviter, with no cap on referrals
+• Cash bonuses with no rollover requirements — withdraw once all conditions are met
+• Freedom to grow your trading power your way
+
+Your referred friends need to deposit a minimum of $100 and trade at least 1 standard lot within 90 days of setting up their Trading Account.
+
+This promotion runs until 30 June 2026 (MT4/MT5 Time).
+
+T&Cs apply</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2</div><div class="suggested-value">TMGM is now making it easier than ever to share your referral link across five platforms.
+
+Utilize our ready-made marketing materials and referral QR codes to expand your reach to more traders and continue growing your rewards.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2a</div><div class="suggested-value">What are you waiting for? Start sharing today and watch your network grow!</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">Start Referring Today</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-sea.com/refer-friends/invite-friends</div></div>
+      <div class="suggested-row"><div class="suggested-label">Disclaimer</div><div class="suggested-value">Disclaimer: Investing in CFDs carries significant risks and is not suitable for all investors. VFSC 40356
+*For full T&Cs, visit [T&C link] or contact support@tmgm.com</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMAIL 5: S2 COUNTDOWN SEQUENCE -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Emails 5a/5b/5c: Invitee S2 — Countdown Sequence &nbsp;|&nbsp; +3d / +30d / +87d &nbsp;|&nbsp; FTD = $0</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">"Newbie tasks" — vague</div><div class="el-section">All 3 EDMs</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Intro paragraphs reference "newbie tasks" without always specifying</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Always specify: deposit min. $100 (first deposit only) and trade at least 1 standard lot. Per T&C C.1.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">No product eligibility / volume formula</div><div class="el-section">All 3 EDMs</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Trade at least 1 lot" without specifying which products count</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add note: FX and Metals count at full lot value. Oil, CFDs, Crypto at 1/10. Shares excluded. Per T&C D.1.a.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">No Cents Account warning</div><div class="el-section">All 3 EDMs</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">No mention of Cents Account restriction</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">Add: "Trading volume from Cents Accounts does not count." Per T&C D.3.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Steps: $100 + 1 lot</div><div class="el-section">All 3 EDMs</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Steps correctly specify $100 first deposit + 1 lot requirement per T&C C.1.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Countdown math</div><div class="el-section">All 3 EDMs</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ +3d (EDM 1) → +30d = 60 days left (EDM 2) → +87d = 3 days left (EDM 3). Math is correct.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+  <div class="issue-card correct-row">
+    <div class="issue-el"><div class="el-name">Urgency escalation</div><div class="el-section">Journey Logic</div></div>
+    <div class="issue-content" style="grid-column: span 2;"><div class="content-text">✅ Natural urgency progression from gentle reminder → countdown → final warning. Journey logic is sound.</div></div>
+    <div class="issue-meta"><span class="severity correct">✅ Correct</span><span class="action nochange">No change</span></div>
+  </div>
+
+  <div class="suggested-block">
+    <div class="suggested-header" onclick="toggleSuggested(this)">📝 Key Amendment for All 3 S2 EDMs — Add this note to the Steps section <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Add After Step 3</div><div class="suggested-value">Note: FX and Metals count at full lot value. Oil, CFDs, and Crypto count at 1/10. Shares/Stocks are excluded. Trading volume from Cents Accounts does not count.
+
+*For full Terms and Conditions, visit [T&C link] or contact support@tmgm.com</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMAIL 6: INVITEE S3 WINNERS -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Email 6: Invitee S3 &nbsp;|&nbsp; Eligible Winners &nbsp;|&nbsp; Tasks complete 🎉</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"program never stops"</div><div class="el-section">Content3a</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"Our Refer-a-Friend program never stops. Keep inviting friends and unlock even more rewards."</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"Keep an eye out for future Refer-a-Friend promotions! In the meantime, keep sharing TMGM with your network."
+Per T&C A.1 — promotion runs 01 Apr – 30 Jun 2026. "Never stops" is misleading.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">"No withdrawal restrictions"</div><div class="el-section">Content3a</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"✅ No withdrawal restrictions on RAF rewards"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be (per T&C)</div><div class="content-text">"✅ No rollover requirements — your rewards are ready to withdraw"
+Per T&C E.2 — at this stage, rewards CAN be withdrawn. But "no withdrawal restrictions" is imprecise.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+
+  <div class="suggested-block">
+    <div class="suggested-header" onclick="toggleSuggested(this)">📝 Full Suggested Email Copy — Invitee S3 (Winners) <svg style="width:16px;height:16px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+    <div class="suggested-body">
+      <div class="suggested-row"><div class="suggested-label">Email Subject</div><div class="suggested-value">Your Refer-A-Friend Reward is Ready!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Preview Text</div><div class="suggested-value">Claim your Refer-A-Friend Reward Now!</div></div>
+      <div class="suggested-row"><div class="suggested-label">Header Banner</div><div class="suggested-value">Refer-A-Friend Reward UNLOCKED
+Claim It Now</div></div>
+      <div class="suggested-row"><div class="suggested-label">Salutation</div><div class="suggested-value">Dear [Name],</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content1</div><div class="suggested-value">Congratulations! Your Refer-A-Friend reward is now unlocked and ready to claim. Redeem it in minutes and start enjoying the benefits you've earned through TMGM's Refer-a-Friend Program.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2</div><div class="suggested-value">How to Claim Your Reward:</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content2a</div><div class="suggested-value">Step 1: Log in to your Client Portal and go to the Refer-a-Friend page
+
+Step 2: Click on "Claim All Rewards"
+
+Step 3: Select your preferred Trading Account and your reward will be credited</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">REDEEM NOW</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-asia.com/refer-friends/invite-friends</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content3</div><div class="suggested-value">Your Refer-A-Friend journey is just the beginning.</div></div>
+      <div class="suggested-row"><div class="suggested-label">Content3a</div><div class="suggested-value">Keep an eye out for future Refer-a-Friend promotions! In the meantime, keep sharing TMGM with your network.
+
+With TMGM, you'll enjoy:
+✅ No rollover requirements — your rewards are ready to withdraw
+✅ The freedom to boost your trading power with your bonuses
+
+*For full Terms and Conditions, visit [T&C link] or contact support@tmgm.com
+T&Cs apply</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA</div><div class="suggested-value">CONTINUE NOW</div></div>
+      <div class="suggested-row"><div class="suggested-label">CTA URL</div><div class="suggested-value">https://portal.tmgm-asia.com/refer-friends/invite-friends</div></div>
+      <div class="suggested-row"><div class="suggested-label">Disclaimer</div><div class="suggested-value">Disclaimer: Investing in CFDs carries significant risks and is not suitable for all investors. VFSC 40356</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DRIP JOURNEY LOGIC -->
+<div class="section-block">
+<div class="section-header navy-header" onclick="toggleSection(this)">
+  <h3>Drip Journey Logic Review — Sequencing, Timing &amp; Gaps</h3>
+  <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="section-body">
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">S1 vs S1(a) timing unclear</div><div class="el-section">Journey Logic</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Both target "TA not opened" but no timing specified between them</div></div>
+    <div class="issue-content"><div class="content-label">Should Be</div><div class="content-text">Clarify: S1 sends immediately, S1(a) sends 7–14 days later if still not opened.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add timing</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">CTA URL inconsistency</div><div class="el-section">Journey Logic</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Inviter emails: portal.tmgm-asia.com
+Invitee S1/S2: portal.tmgm-sea.com</div></div>
+    <div class="issue-content"><div class="content-label">Should Be</div><div class="content-text">Verify both domains resolve correctly. Use one consistent domain.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action amend">✏️ Verify</span></div>
+  </div>
+  <div class="issue-card important-row">
+    <div class="issue-el"><div class="el-name">No ROW country coverage</div><div class="el-section">Journey Logic</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">Languages: EN, ID, VN, TH, KO — SEA markets only</div></div>
+    <div class="issue-content"><div class="content-label">Should Be</div><div class="content-text">T&C Appendix 1 includes 14 ROW countries. May need separate English-only EDMs for ROW.</div></div>
+    <div class="issue-meta"><span class="severity important">🟡 Important</span><span class="action add">✅ Add</span></div>
+  </div>
+  <div class="issue-card critical-row">
+    <div class="issue-el"><div class="el-name">Indonesian $150 error</div><div class="el-section">Invitee S1 (ID column)</div></div>
+    <div class="issue-content"><div class="content-label">Current</div><div class="content-text">"$50 untuk Anda dan $150 untuk teman Anda"</div></div>
+    <div class="issue-content"><div class="content-label">Should Be</div><div class="content-text">"$50 untuk Anda dan $50 untuk teman Anda" — per T&C C.1.</div></div>
+    <div class="issue-meta"><span class="severity critical">🔴 Critical</span><span class="action amend">✏️ Amend</span></div>
+  </div>
+</div>
+</div>
+
+</div><!-- end tab-edm -->
+
+</div><!-- end main -->
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.closest('.tab-btn').classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function toggleSection(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function toggleSuggested(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function filterSummary(sev, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.summary-table tbody tr').forEach(row => {
+    if (sev === 'all') { row.style.display = ''; }
+    else { row.style.display = row.dataset.sev === sev ? '' : 'none'; }
+  });
+}
+</script>
+
+</body>
+</html>
