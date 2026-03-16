@@ -108,6 +108,12 @@ body { font-family: var(--font); background: var(--grey-50); color: var(--grey-8
   background: var(--grey-100); color: var(--grey-500);
 }
 .tab-btn.active .tab-count { background: var(--mid-blue); color: white; }
+.tc-tab-link {
+  text-decoration: none; margin-left: auto;
+  color: var(--mid-blue) !important; border-bottom-color: transparent !important;
+  font-weight: 700 !important; font-size: 13px !important;
+}
+.tc-tab-link:hover { color: var(--navy) !important; background: var(--grey-50); }
 
 /* MAIN CONTENT */
 .main { max-width: 1280px; margin: 0 auto; padding: 24px 40px 80px; }
@@ -282,6 +288,7 @@ body { font-family: var(--font); background: var(--grey-50); color: var(--grey-8
     <button class="tab-btn active" onclick="switchTab('summary')">Master Summary <span class="tab-count">44</span></button>
     <button class="tab-btn" onclick="switchTab('lp')">Landing Page <span class="tab-count">27</span></button>
     <button class="tab-btn" onclick="switchTab('edm')">EDM Drip Journey <span class="tab-count">17</span></button>
+    <a href="https://bidholdinggroup.sharepoint.com/:b:/s/GlobalMarketingTMGM/IQDpeeDQ51S_T7TworqMo52NAQ5geIlY-bQFKPVkrOxvWR8?e=lqRKZO" target="_blank" rel="noopener" class="tab-btn tc-tab-link">📄 T&C Document</a>
   </div>
 </div>
 
